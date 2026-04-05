@@ -17,17 +17,60 @@ Replace this paragraph with your own summary of what your version does.
 
 ## How The System Works
 
-Explain your design in plain language.
+Each song contains the following attributes: *title, artist, genre, mood, energy, tempo_bpm, valence, danceability, acousticness*
 
-Some prompts to answer:
+Using these user preferences, song recommendations will be made and personalized: *favorite_genre, favorite_mood, target_energy, likes_acoustic, target_valence, target_tempo*
 
-- What features does each `Song` use in your system
-  - For example: genre, mood, energy, tempo
-- What information does your `UserProfile` store
-- How does your `Recommender` compute a score for each song
-- How do you choose which songs to recommend
+How the music recommendation logic work is that, for all the songs recorded in the system, the recommender will first scan for matching favorite genre and mood. The list of song matches will be further refined through attributes like energy, valence, and acousticness. A descending ranked list of songs will be shared with user, based on their personal preferences through a set of scoring rules.
 
-You can include a simple diagram or bullet list if helpful.
+Here is a mermaid diagram of the music recommender logic:
+
+flowchart TD
+    
+    A([User Profile\ngenre · mood · target_energy · likes_acoustic]) --> B
+
+    B[Load songs from songs.csv] --> C{More songs\nto evaluate?}
+
+    C -- Yes --> D[Get next song]
+
+    D --> E1[genre_score\n1.0 if match else 0.0\n× 0.35]
+    D --> E2[mood_score\n1.0 if match else 0.0\n× 0.25]
+    D --> E3[energy_score\n1 - abs_user - song_\n× 0.20]
+    D --> E4[acoustic_score\nacousticness if likes_acoustic\nelse 1 - acousticness\n× 0.12]
+    D --> E5[valence_score\n1 - abs_derived - song_\n× 0.08]
+
+    E1 & E2 & E3 & E4 & E5 --> F[Sum weighted scores\n→ final score 0.0–1.0]
+
+    F --> G[(scored_songs\nrunning list)]
+    G --> C
+
+    C -- No more songs --> H[Sort scored_songs\nby score descending]
+    H --> I[Take top K results]
+    I --> J([Output\nTop K Recommendations\nwith scores + explanations])
+
+    style A fill:#4A90D9,color:#fff
+    style J fill:#27AE60,color:#fff
+    style G fill:#8E44AD,color:#fff
+    style F fill:#E67E22,color:#fff
+
+**Algorithm Recipe**
+
+- genre_score = 1.0  if song.genre == user.favorite_genre  else 0.0
+- mood_score  = 1.0  if song.mood  == user.favorite_mood   else 0.0
+- energy_score = 1 - |user.target_energy - song.energy|
+- Threshold: acousticness >= 0.6 → "acoustic", < 0.6 → "non-acoustic"
+- valence_score   = 1 - |user_valence - song.valence|
+    -  mood_to_valence = { "happy": 0.8, "chill": 0.6, "focused": 0.55,   "relaxed": 0.65, "moody": 0.45, "intense": 0.5 }
+    - user_valence    = mood_to_valence[user.favorite_mood]
+- score = (genre_score   × 0.35)
+      + (mood_score    × 0.25)
+      + (energy_score  × 0.20)
+      + (acoustic_score × 0.12)
+      + (valence_score  × 0.08)
+
+**Potential Biases**
+- Genre and mood are binary matches, so if a user likes a genre or mood that is underrepresented in the catalog, they may get very few recommendations.
+- Genre, being the most considered attribute, may override songs who are not matching the genre but closely matching with other attributes. 
 
 ---
 
@@ -44,15 +87,15 @@ You can include a simple diagram or bullet list if helpful.
 
 2. Install dependencies
 
-```bash
-pip install -r requirements.txt
-```
+    ```bash
+    pip install -r requirements.txt
+    ```
 
 3. Run the app:
 
-```bash
-python -m src.main
-```
+    ```bash
+    python -m src.main
+    ```
 
 ### Running Tests
 
@@ -138,7 +181,26 @@ Describe your scoring logic in plain language.
 - What information about the user does it use
 - How does it turn those into a number
 
-Try to avoid code in this section, treat it like an explanation to a non programmer.
+> For the scoring logic of songs, in the relevance of individual songs, the most important factors are the genre and mood. The related user preferences can retrieved from the user profiles, which is good for making the recommendations more personalized. Energy attribute is used for fine tuning the songs in their intensities(energy), referencing the 'target_energy' user sets. In support, acousticness and valence are used to score the song further. The algorithm identifies whether the user likes or not acoustic by setting a boolean on the user profiles (e.g. if user likes acoustics, the song will higher scores on acousticness will be considered). Valence would be used in support of genre/mood, when songs match in the previous attributes but give different feels. For each attribute used for scoring, we use slightly different scoring formulas. Attributes like genre and mood, because they are most heavily weighted, it is either yes or no (i.e. 0 or 35% for genre, same for mood). Similarly, for acousticness, with consideration of user's preference for acoustic, if the acousticness of a song passes a threshold, the song will either be considered or not. Lastly, for values like energy and valence, it is slightly more complex with comparisons between user preferene data and song data to calculate the score of how they match. The higher the value, the more the song should match the user's taste.
+
+> Here are the song attribute weights: 
+> - Genre: 35%
+> - Mood: 25%
+> - Energy: 20%
+> - Acousticness: 12%
+> - Valence: 8% 
+
+>The following user info will be used: 
+> - favorite genre
+> - favorite mood
+> - target energy
+> - acoustic preference (boolean)
+
+**Sample Music Recommendations**
+
+![Music Recommendation Output 1](music_rec_1.png)
+
+![Music Recommendation Output 2](music_rec_2.png)
 
 ---
 
