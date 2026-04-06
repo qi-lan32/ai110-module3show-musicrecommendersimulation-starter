@@ -188,50 +188,26 @@ Describe your scoring logic in plain language.
 
 ## 4. Data
 
-Describe your dataset.
-
-- How many songs are in `data/songs.csv`
-- Did you add or remove any songs
-- What kinds of genres or moods are represented
-- Whose taste does this data mostly reflect
+ The dataset contains 20 songs, with 4 genres (pop, rock, jazz, classical) and 4 moods (happy, sad, energetic, calm). Each song has attributes for energy, acousticness, and valence. The dataset is small and does not cover all possible genres or moods, which may limit the diversity of recommendations. Additionally, it does not include user listening history or other contextual factors that real recommendation systems often use.
 
 ---
 
 ## 5. Strengths
 
-Where does your recommender work well
-
-You can think about:
-- Situations where the top results "felt right"
-- Particular user profiles it served well
-- Simplicity or transparency benefits
+The system works well on finding songs for recommendation, even if the catalog lacks in the desired categories. It will recommend songs that matches the user preferences as much as possible and rank them based on their scores. For example, if a user has a strong preference for pop music and energetic mood, the system will prioritize songs that fit those criteria, even if there are only a few options available. Additionally, the system's use of multiple attributes (genre, mood, energy, acousticness, valence) allows it to capture a more nuanced understanding of user preferences and make recommendations that align with the user's overall taste.
 
 ---
 
 ## 6. Limitations and Bias
 
-Where does your recommender struggle
-
-Some prompts:
-- Does it ignore some genres or moods
-- Does it treat all users as if they have the same taste shape
-- Is it biased toward high energy or one genre by default
-- How could this be unfair if used in a real product
+The system does not consider features such as artist popularity, release date, or user listening history, which are often important factors in real recommendation systems. This can lead to recommendations that may not align with a user's actual preferences or current trends. Additionally, the dataset is limited in terms of genres and moods, which may result in underrepresentation of certain music styles and emotional tones. The scoring system may also overfit to certain preferences, such as genre or mood, at the expense of other attributes like energy or acousticness, leading to less diverse recommendations. Finally, the system's reliance on explicit user preferences may unintentionally favor users who have more defined tastes or who are more familiar with their own preferences, while disadvantaging users who are more exploratory or less certain about their music tastes.
 
 ---
 
 ## 7. Evaluation
 
-How did you check your system
-
-Examples:
-- You compared your simulation to what a real app like Spotify or YouTube tends to recommend
-- You wrote tests for your scoring logic
-
-You do not need a numeric metric, but if you used one, explain what it measures.
-
 **Distinct and Conflicting User Profiles**
-To evaluate the performance of the music recommender system, I created several distinct user profiles with varying preferences for genre, mood, energy level, and acousticness. For example: 
+To test the recommender logic, I created 4 user profiles, which each test for a different scenario: default(common scenario), contradictory(high energy + sad mood), acoustic attribute flaw (there should be difference in recommendation if user had 0.1 float, instead of 0.9), and nonexisting genre (what happens if the genre + mood combo does not exist). Here are two of the user profiles: 
 
 - Contradictory (High Energy + Sad Mood)
     ![alt text](contradictory.png)
@@ -241,25 +217,17 @@ To evaluate the performance of the music recommender system, I created several d
 - Nonexisting Genre (Genre + Mood combo that does not exist)
 ![alt text](nonexisting.png)
 > This profile tests the scenario where the user has a genre and mood combination that does not exist in the songs data. This will test whether the system can still provide recommendations based on other attributes like energy, acousticness, and valence.
+
+In comparison, I ran a test that uses the same user profiles but removed the 'mood' attribute from consideration. The result was that the songs that relied on mood attribute for the matching, had much lower ranks than before. Especially when we consider user profiles with rare mood preferences, songs with the specific mood, does not land high on the recommendation list, compared to songs that have the favored gnere. 
+
 ---
 
 ## 8. Future Work
 
-If you had more time, how would you improve this recommender
-
-Examples:
-
-- Add support for multiple users and "group vibe" recommendations
-- Balance diversity of songs instead of always picking the closest match
-- Use more features, like tempo ranges or lyric themes
+To improve the model, I would consider adding additional features such as artist popularity, release date, and user listening history to provide more context for the recommendations. This would allow the system to make more informed suggestions based on a user's past behavior and current trends in music. I can also add an option to the recommendation list where if user want to explore music much more diverse, the recommendations would return unranked, but in a randomized manner.
 
 ---
 
 ## 9. Personal Reflection
 
-A few sentences about what you learned:
-
-- What surprised you about how your system behaved
-- How did building this change how you think about real music recommenders
-- Where do you think human judgment still matters, even if the model seems "smart"
-
+Through this project, I learned about the various factors that go into building a music recommendation system and how different attributes can be weighted to create personalized recommendations. I found it interesting how even a simple model can capture some aspects of user preferences, but also how it can fall short with the limited information. This experience has made me more aware of the complexities behind music recommendation algorithms and the importance of finding the balance between different attributes to provide diverse, yet relevant suggestions to users. An even broader realization is that, even though the data used by the recommender logic is summarized to numerical values, these data were sourced from human users. Hence, how 'smart' a recommender can become relies on the information the users provides it, proving the neccessity of human input for these systems.
