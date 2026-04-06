@@ -2,16 +2,7 @@
 
 ## Project Summary
 
-In this project you will build and explain a small music recommender system.
-
-Your goal is to:
-
-- Represent songs and a user "taste profile" as data
-- Design a scoring rule that turns that data into recommendations
-- Evaluate what your system gets right and wrong
-- Reflect on how this mirrors real world AI recommenders
-
-Replace this paragraph with your own summary of what your version does.
+The main goal of my music recommender, FeelIt, is to get my listeners immersed in their music world by providing personal recommendations that matches their taste and mood. Thru user preferences set in user profiles, the recommender logic, takes that input, and returns to users songs, matching their preferences, by the percentages. Users may view reasons behind why the specific songs are recommended and have complete transparency on how the songs are scored for matches. The logic used for my recommender are relevant to existing recommender out there, which means it is also prone to biases and have flaws. Not every song recommendation may meet the expectation of the listeners but it is designed to bring music as close to the users' tastes as possible.
 
 ---
 
@@ -117,20 +108,17 @@ Use this section to document the experiments you ran. For example:
 - What happened when you added tempo or valence to the score
 - How did your system behave for different types of users
 
+
+---
+- Test recommender logic by creating distinct, conflicting user profiles to see recommendation outcome
+- Remove the 'Mood' attribute from the scoring formula completely, compare the song recommendations with/without
 ---
 
 ## Limitations and Risks
 
-Summarize some limitations of your recommender.
-
-Examples:
-
-- It only works on a tiny catalog
-- It does not understand lyrics or language
-- It might over favor one genre or mood
-
-You will go deeper on this in your model card.
-
+- Genre takes the bigger weight on whether a song is considered for recommendation
+- Lyrics and language are not factors of consideration when chosing songs
+- 
 ---
 
 ## Reflection
@@ -158,19 +146,13 @@ Combines reflection and model card framing from the Module 3 guidance. :contentR
 
 Give your recommender a name, for example:
 
-> VibeFinder 1.0
+> FeelIt
 
 ---
 
 ## 2. Intended Use
 
-- What is this system trying to do
-- Who is it for
-
-Example:
-
-> This model suggests 3 to 5 songs from a small catalog based on a user's preferred genre, mood, and energy level. It is for classroom exploration only, not for real users.
-
+> FeelIt mimicks how a simple version of existing recommendation systems function by suggesting 5 songs from a limited catalog using users' preferences stated on their profiles. It serves a learning purpose on understanding how recommendation logics and systems are built.
 ---
 
 ## 3. How It Works (Short Explanation)
@@ -243,12 +225,22 @@ Some prompts:
 How did you check your system
 
 Examples:
-- You tried multiple user profiles and wrote down whether the results matched your expectations
 - You compared your simulation to what a real app like Spotify or YouTube tends to recommend
 - You wrote tests for your scoring logic
 
 You do not need a numeric metric, but if you used one, explain what it measures.
 
+**Distinct and Conflicting User Profiles**
+To evaluate the performance of the music recommender system, I created several distinct user profiles with varying preferences for genre, mood, energy level, and acousticness. For example: 
+
+- Contradictory (High Energy + Sad Mood)
+    ![alt text](contradictory.png)
+
+> This profiles tests contradicting energy and mood. As we only have one sad song in our songs data, this will test whether the this song will get pushed down on the rank list due to its low energy.
+
+- Nonexisting Genre (Genre + Mood combo that does not exist)
+![alt text](nonexisting.png)
+> This profile tests the scenario where the user has a genre and mood combination that does not exist in the songs data. This will test whether the system can still provide recommendations based on other attributes like energy, acousticness, and valence.
 ---
 
 ## 8. Future Work
